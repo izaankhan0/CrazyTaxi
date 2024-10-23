@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <conio.h>  // For _kbhit() and _getch() in Windows
 
-#define CONSOLE_WIDTH 80  // Assumed console width
+#define CONSOLE_WIDTH 115  // Assumed console width
 
 // Function to print centered text
 void printCentered(char* text) {
@@ -24,13 +24,13 @@ void displayArt() {
     printCentered(" ##     ## ##     ## ##     ##  ##           ##       ");
     printCentered("  #######  ##     ## ##     ## ########      ##       ");
     printCentered("\n");
-    printCentered(" ############   #####   ##    ##   ##########");
+    printCentered(" ############   #####   ##    ##   ########## ");
     printCentered("      ##       #     #   ##  ##        ##     ");
     printCentered("      ##      ##     ##   ####         ##     ");
     printCentered("      ##      #########    ###         ##     ");
     printCentered("      ##      ##     ##   ## ##        ##     ");
     printCentered("      ##      ##     ##  ##   ##       ##     ");
-    printCentered("      ##      ##     ## ##     ##   ######## ");
+    printCentered("      ##      ##     ## ##     ##   ########  ");
 
     // Reset to default color and add a newline for spacing
     printf("\033[0m\n");
