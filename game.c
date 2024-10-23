@@ -16,12 +16,21 @@ void printCentered(char* text) {
 void displayArt() {
     // Escape sequences to set text color (yellow for the heading)
     printf("\033[33m");  // Yellow color
-    printCentered("  #####   #####    ###   #####   ##   ##    ####   ######    ##   ##");
-    printCentered(" ##      ##   ##   ###  ##   ##  ###  ##   ##       ##   ##   ###  ##");
-    printCentered(" ##      ##   ##    #   ##       #### ##    ####    ##   ##   #### ##");
-    printCentered(" ##  ### #######    #   ##  ###  ## ####       ##   ######    ## ####");
-    printCentered(" ##   ## ##   ##    #   ##   ##  ##  ###   ##   ##  ##   ##   ##  ###");
-    printCentered("  #####  ##   ##   ###   #####   ##   ##    ####   ##   ##   ##   ##");
+    printCentered("  #######  ########    #####   ######## ##        ##  ");
+    printCentered(" ##        ##     ##  #     #       ##   ##      ##   ");
+    printCentered(" ##        ##     ## ##     ##     ##     ##    ##    ");
+    printCentered(" ##        ########  #########    ##       ##  ##     ");
+    printCentered(" ##     ## ##     ## ##     ##   ##          ##       ");
+    printCentered(" ##     ## ##     ## ##     ##  ##           ##       ");
+    printCentered("  #######  ##     ## ##     ## ########      ##       ");
+    printCentered("\n");
+    printCentered(" ############   #####   ##    ##   ##########");
+    printCentered("      ##       #     #   ##  ##        ##     ");
+    printCentered("      ##      ##     ##   ####         ##     ");
+    printCentered("      ##      #########    ###         ##     ");
+    printCentered("      ##      ##     ##   ## ##        ##     ");
+    printCentered("      ##      ##     ##  ##   ##       ##     ");
+    printCentered("      ##      ##     ## ##     ##   ######## ");
 
     // Reset to default color and add a newline for spacing
     printf("\033[0m\n");
