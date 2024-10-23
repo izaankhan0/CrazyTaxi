@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <conio.h>  // For _kbhit() and _getch() in Windows
 
-#define CONSOLE_WIDTH 80  // Assumed console width
+#define CONSOLE_WIDTH 115  // Assumed console width
 
 // Function to print centered text
 void printCentered(char* text) {
@@ -16,12 +16,21 @@ void printCentered(char* text) {
 void displayArt() {
     // Escape sequences to set text color (yellow for the heading)
     printf("\033[33m");  // Yellow color
-    printCentered("  #####   #####    ###   #####   ##   ##    ####   ######    ##   ##");
-    printCentered(" ##      ##   ##   ###  ##   ##  ###  ##   ##       ##   ##   ###  ##");
-    printCentered(" ##      ##   ##    #   ##       #### ##    ####    ##   ##   #### ##");
-    printCentered(" ##  ### #######    #   ##  ###  ## ####       ##   ######    ## ####");
-    printCentered(" ##   ## ##   ##    #   ##   ##  ##  ###   ##   ##  ##   ##   ##  ###");
-    printCentered("  #####  ##   ##   ###   #####   ##   ##    ####   ##   ##   ##   ##");
+    printCentered("  #######  ########    #####   ######## ##        ##  ");
+    printCentered(" ##        ##     ##  #     #       ##   ##      ##   ");
+    printCentered(" ##        ##     ## ##     ##     ##     ##    ##    ");
+    printCentered(" ##        ########  #########    ##       ##  ##     ");
+    printCentered(" ##     ## ##     ## ##     ##   ##          ##       ");
+    printCentered(" ##     ## ##     ## ##     ##  ##           ##       ");
+    printCentered("  #######  ##     ## ##     ## ########      ##       ");
+    printCentered("\n");
+    printCentered(" ############   #####   ##     ##  ########## ");
+    printCentered("      ##       #     #   ##   ##       ##     ");
+    printCentered("      ##      ##     ##   ## ##        ##     ");
+    printCentered("      ##      #########    ###         ##     ");
+    printCentered("      ##      ##     ##   ## ##        ##     ");
+    printCentered("      ##      ##     ##  ##   ##       ##     ");
+    printCentered("      ##      ##     ## ##     ##   ########  ");
 
     // Reset to default color and add a newline for spacing
     printf("\033[0m\n");
@@ -70,13 +79,13 @@ int main() {
         displayArt();
 
         if (choice == 0) {
-            printCentered("\033[36m        -> Start Game\033[0m");  // Cyan for selected option
+            printCentered("\033[36m         -> Start Game\033[0m");  // Cyan for selected option
         } else {
             printCentered("   Start Game");
         }
         
         if (choice == 1) {
-            printCentered("\033[36m        -> Instructions\033[0m");  // Cyan for selected option
+            printCentered("\033[36m         -> Instructions\033[0m");  // Cyan for selected option
         } else {
             printCentered("   Instructions");
         }
@@ -94,7 +103,7 @@ int main() {
         }
 
         if (choice == 4) {
-            printCentered("\033[36m        -> Quit\033[0m");  // Cyan for selected option
+            printCentered("\033[36m         -> Quit\033[0m");  // Cyan for selected option
         } else {
             printCentered("   Quit");
         }

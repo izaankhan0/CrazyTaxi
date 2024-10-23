@@ -24,9 +24,9 @@ void displayArt() {
     printCentered(" ##     ## ##     ## ##     ##  ##           ##       ");
     printCentered("  #######  ##     ## ##     ## ########      ##       ");
     printCentered("\n");
-    printCentered(" ############   #####   ##    ##   ########## ");
-    printCentered("      ##       #     #   ##  ##        ##     ");
-    printCentered("      ##      ##     ##   ####         ##     ");
+    printCentered(" ############   #####   ##     ##  ########## ");
+    printCentered("      ##       #     #   ##   ##       ##     ");
+    printCentered("      ##      ##     ##   ## ##        ##     ");
     printCentered("      ##      #########    ###         ##     ");
     printCentered("      ##      ##     ##   ## ##        ##     ");
     printCentered("      ##      ##     ##  ##   ##       ##     ");
