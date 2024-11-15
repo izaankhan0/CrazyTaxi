@@ -4,8 +4,8 @@
 #include <conio.h>
 #include <windows.h>
 
-#define OFTEN 3
-#define SPEED 5
+int OFTEN = 7;
+int SPEED  = 10;
 #define WIDTH 80  // Total width including lane separators
 #define HEIGHT 20
 #define CAR_POS_Y (HEIGHT - 2)
@@ -215,9 +215,83 @@ void instructions() {
 
 void levels() {
     system("cls");
-    printf("\033[32mGame to banalee pehle\033[0m\n");
-    _getch();
+    int choice = 0;  // Track the user's level choice
+    char input;
+
+    while (1) {
+        // Clear screen and display level options
+        system("cls");
+        displayArt();
+        printCentered("\033[32m\tChoose Your Level:\033[0m");
+
+        if (choice == 0) {
+            printCentered("\033[31m  -> Impossible Level\033[0m");  // Dark red for impossible
+        } else {
+            printCentered("   Impossible Level");
+        }
+
+        if (choice == 1) {
+            printCentered("\033[91m     -> Hard Level\033[0m");  // Light red for hard
+        } else {
+            printCentered("   Hard Level");
+        }
+
+        if (choice == 2) {
+            printCentered("\033[33m    -> Medium Level\033[0m");  // Orange for medium
+        } else {
+            printCentered("   Medium Level");
+        }
+
+        if (choice == 3) {
+            printCentered("\033[92m      -> Easy Level\033[0m");  // Light green for easy
+        } else {
+            printCentered("   Easy Level");
+        }
+
+        if (choice == 4) {
+            printCentered("\033[90m        -> Back\033[0m");  // Gray for back
+        } else {
+            printCentered("\033[90m   Back\033[0m");
+        }
+
+        // Wait for user input (w = up, s = down, enter to select)
+        input = _getch();
+
+        if (input == 'w') {
+            if (choice > 0) {
+                choice--;
+            }
+        } else if (input == 's') {
+            if (choice < 4) {
+                choice++;
+            }
+        } else if (input == '\r') {  // Enter key
+            // Update difficulty or go back
+            if (choice == 0) {
+                OFTEN = 2;
+                SPEED = 2;
+            } else if (choice == 1) {
+                OFTEN = 3;
+                SPEED = 3;
+            } else if (choice == 2) {
+                OFTEN = 4;
+                SPEED = 5;
+            } else if (choice == 3) {
+                OFTEN = 4;
+                SPEED = 10;
+            } else if (choice == 4) {
+                return;  // Go back to the main menu
+            }
+
+            // Confirm the choice and go back to the main menu
+            system("cls");
+            printCentered("\033[32mLevel Selected. Returning to Main Menu...\033[0m");
+            return;
+        }
+    }
 }
+
+
 
 void credits() {
     system("cls");
@@ -296,7 +370,7 @@ int main() {
             }
             if (choice == 4) {
                 printf("\033[31mExiting the game. Goodbye!\033[0m\n");  // Red text
-                return;  // Exit menu loop
+                return 0;  // Exit menu loop
             }
         }
     }
