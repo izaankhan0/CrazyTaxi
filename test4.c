@@ -4,9 +4,9 @@
 #include <conio.h>
 #include <windows.h>
 
-#define WIDTH 20
+#define WIDTH 40
 #define HEIGHT 40
-#define CAR_POS_Y (HEIGHT - 2)
+#define CAR_POS_Y (HEIGHT - 3)  // Adjusted for bigger car size
 #define CONSOLE_WIDTH 115  // Assumed console width
 
 int car_pos_x = WIDTH / 2;
@@ -14,13 +14,6 @@ int score = 0;
 int traffic_x[HEIGHT];  // X positions of traffic cars
 int traffic_y[HEIGHT];  // Y positions of traffic cars
 int traffic_count = 0;  // Number of traffic cars on the road
-
-void gotoxy(int x, int y) {
-    COORD coord;
-    coord.X = x;
-    coord.Y = y;
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-}
 
 void setup() {
     system("cls");
@@ -34,20 +27,24 @@ void setup() {
 }
 
 void draw() {
-    gotoxy(0, 0);  // Move cursor to the top left before drawing
+    system("cls");
 
-    // Draw the road and the traffic
+    // Draw the road, player car, and traffic cars
     for (int y = 0; y < HEIGHT; y++) {
         for (int x = 0; x < WIDTH; x++) {
             if (y == CAR_POS_Y && x == car_pos_x) {
-                printf("A");  // Player's car
+                printf("  A A ");  // First row of player car
+            } else if (y == CAR_POS_Y + 1 && x == car_pos_x) {
+                printf(" XXXXXX");  // Second row of player car
             } else {
                 int is_traffic = 0;
                 for (int i = 0; i < traffic_count; i++) {
-                    if (traffic_x[i] == x && traffic_y[i] == y) {
-                        printf("V");  // Traffic vehicle
+                    if (traffic_y[i] == y && traffic_x[i] == x) {
+                        printf("  V V ");  // First row of traffic car
                         is_traffic = 1;
-                        break;
+                    } else if (traffic_y[i] + 1 == y && traffic_x[i] == x) {
+                        printf(" XXXXXX");  // Second row of traffic car
+                        is_traffic = 1;
                     }
                 }
                 if (!is_traffic) {
@@ -68,15 +65,15 @@ void update_traffic() {
         if (traffic_y[i] < HEIGHT - 1) {
             traffic_y[i]++;
         } else {
-            // If traffic is out of the screen, remove it
+            // If traffic is out of the screen, reset it
             traffic_x[i] = -1;
             traffic_y[i] = -1;
         }
     }
 
-    // Add new traffic car
-    if (rand() % 5 == 0) {  // Add traffic at random intervals
-        traffic_x[traffic_count] = rand() % WIDTH;
+    // Add new traffic car at random intervals
+    if (rand() % 5 == 0) {
+        traffic_x[traffic_count] = rand() % (WIDTH - 6);  // Adjusted for vehicle width
         traffic_y[traffic_count] = 0;
         traffic_count++;
     }
@@ -84,7 +81,9 @@ void update_traffic() {
 
 void check_collision() {
     for (int i = 0; i < traffic_count; i++) {
-        if (traffic_y[i] == CAR_POS_Y && traffic_x[i] == car_pos_x) {
+        // Check both rows of the player car for collisions
+        if ((traffic_y[i] == CAR_POS_Y || traffic_y[i] == CAR_POS_Y + 1) &&
+            (traffic_x[i] == car_pos_x || traffic_x[i] + 4 > car_pos_x)) {
             printf("Game Over! Final score: %d\n", score);
             exit(0);
         }
@@ -99,7 +98,7 @@ void input() {
                 if (car_pos_x > 0) car_pos_x--;  // Move left
                 break;
             case 'd':
-                if (car_pos_x < WIDTH - 1) car_pos_x++;  // Move right
+                if (car_pos_x < WIDTH - 6) car_pos_x++;  // Move right
                 break;
         }
     }
@@ -143,13 +142,12 @@ void displayArt() {
     printCentered("  //  ||\\ \\ ");
     printCentered(" ____||_ ||_\\___");
     printCentered("'  _     _      O  _");
-    printCentered("'-(_)---(_)------(_)-'");
+    printCentered("'-(_)---(_)------(_)-'"); 
     printf("\033[0m\n");
 }
 
 void startGame() {
     printf("\033[32mStarting the game...\033[0m\n");  // Green text
-
     setup();
 
     while (1) {
@@ -161,23 +159,21 @@ void startGame() {
         score++;
         Sleep(100);  // Control game speed
     }
-
-    _getch();  // Pause for the user to see the message
 }
 
-void instructions(){
+void instructions() {
     system("cls");
     printf("\033[32mJOOS PILADOOOOOOOOO\033[0m\n");
     _getch();
 }
 
-void scores(){
+void scores() {
     system("cls");
     printf("\033[32mGame to banalee pehle\033[0m\n");
     _getch();
 }
 
-void credits(){
+void credits() {
     system("cls");
     printf("\033[32mIzaan Khan\033[0m\n");
     printf("\033[32mTalha Avasti\033[0m\n");
