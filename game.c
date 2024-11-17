@@ -6,13 +6,13 @@
 
 int OFTEN = 7;
 int SPEED  = 10;
-#define WIDTH 80  // Total width including lane separators
+#define WIDTH 80  
 #define HEIGHT 20
 #define CAR_POS_Y (HEIGHT - 2)
-#define CONSOLE_WIDTH 115  // Assumed console width
+#define CONSOLE_WIDTH 115  
 
-int lanes[8] = {0, 10, 20, 30, 40, 50, 60, 70};  // X positions of the lanes
-int car_lane = 1;  // Player starts in the middle lane (index 1)
+int lanes[8] = {0, 10, 20, 30, 40, 50, 60, 70};  
+int car_lane = 1;  
 int score = 0;
 char *taxi_designs[5] = {"{<..>}", "{oOOo}", "{8<>8}", "{:TT:}", "{*oO*}"};
 
@@ -21,16 +21,15 @@ typedef struct {
     int y;
     int lane;
     int active;
-    char *design;  // New attribute to hold the design of the car
+    char *design;  
 } TrafficCar;
 
-TrafficCar traffic[HEIGHT];  // Array of traffic cars to simulate multiple traffic items
+TrafficCar traffic[HEIGHT];  
 
 void setup() {
     system("cls");
     srand(time(NULL));
 
-    // Initialize all traffic cars as inactive
     for (int i = 0; i < HEIGHT; i++) {
         traffic[i].x = -1;
         traffic[i].y = -1;
@@ -38,33 +37,33 @@ void setup() {
         traffic[i].active = 0;
         traffic[i].design = NULL;
     }
-    car_lane = 1;  // Reset player position to the middle lane
-    score = 0;     // Reset score
+    car_lane = 1;  
+    score = 0;     
 }
 
 void draw() {
     system("cls");
 
     for (int y = 0; y < HEIGHT; y++) {
-        // Left border
+
         printf("\e[1;31m...\033[0m");
 
         for (int x = 0; x < WIDTH; x++) {
             if (y == CAR_POS_Y && x == lanes[car_lane] + 1) {
                 printf("\e[0;33m[:TAXI:]\033[0m");
-                x += 7;  // Skip over player's car width
+                x += 7;  
             } else {
                 int is_traffic = 0;
                 for (int i = 0; i < HEIGHT; i++) {
                     if (traffic[i].y == y && traffic[i].active && x == traffic[i].x + 2) {
                         printf("\e[0;32m%s\033[0m", traffic[i].design);
                         is_traffic = 1;
-                        x += 5;  // Skip over traffic car width
+                        x += 5;  
                         break;
                     }
                 }
                 if (!is_traffic) {
-                    // Check if current position `x` is a lane separator
+
                     int is_lane_separator = 0;
                     for (int j = 0; j < 7; j += 2) {
                         if (j < 8 && x == lanes[j]) {
@@ -82,32 +81,30 @@ void draw() {
         printf("\e[1;31m|...\033[0m\n");
     }
 
-    // Display score at the bottom
     printf("\e[1;31mScore: %d\033[0m\n", score);
 }
 
 void update_traffic() {
-    // Move existing traffic downward
+
     for (int i = 0; i < HEIGHT; i++) {
         if (traffic[i].active) {
             traffic[i].y++;
             if (traffic[i].y >= HEIGHT) {
-                // Deactivate if it moves out of bounds
+
                 traffic[i].active = 0;
             }
         }
     }
 
-    // Add new traffic car at random intervals
-    if (rand() % OFTEN == 0) {  // Adjust frequency to control traffic density
+    if (rand() % OFTEN == 0) {  
         for (int i = 0; i < HEIGHT; i++) {
-            if (!traffic[i].active) {  // Find an inactive slot
-                int lane = rand() % 8;  // Choose a random lane
+            if (!traffic[i].active) {  
+                int lane = rand() % 8;  
                 traffic[i].x = lanes[lane];
-                traffic[i].y = 0;  // Start at the top of the screen
+                traffic[i].y = 0;  
                 traffic[i].lane = lane;
                 traffic[i].active = 1;
-                traffic[i].design = taxi_designs[rand() % 5];  // Randomly assign a design
+                traffic[i].design = taxi_designs[rand() % 5];  
                 break;
             }
         }
@@ -120,14 +117,12 @@ void check_collision() {
             system("cls");
             printf("\033[31mGame Over!\033[0m Final score: %d\n", score);
 
-            // Display retry and return to main menu options
             printf("Press 'r' to retry or 'm' to return to the main menu.\n");
 
-            // Wait for user input to choose option
             while (1) {
                 char choice = _getch();
                 if (choice == 'r') {
-                    setup();  // Restart the game
+                    setup();  
                     return;
                 } else if (choice == 'm') {
                     main();
@@ -142,28 +137,26 @@ void input() {
         char key = _getch();
         switch (key) {
             case 'a':
-                if (car_lane > 0) car_lane--;  // Move left
+                if (car_lane > 0) car_lane--;  
                 break;
             case 'd':
-                if (car_lane < 7) car_lane++;  // Move right
+                if (car_lane < 7) car_lane++;  
                 break;
         }
     }
 }
 
-// Function to print centered text
 void printCentered(char* text) {
-    int padding = (CONSOLE_WIDTH - strlen(text)) / 2;  // Calculate padding
+    int padding = (CONSOLE_WIDTH - strlen(text)) / 2;  
     for (int i = 0; i < padding; i++) {
-        printf(" ");  // Print padding spaces
+        printf(" ");  
     }
-    printf("%s\n", text);  // Print the centered text
+    printf("%s\n", text);  
 }
 
-// Function to display the large "CRAZY TAXI" heading and racing car ASCII art
 void displayArt() {
-    // Escape sequences to set text color (yellow for the heading)
-    printf("\033[33m");  // Yellow color
+
+    printf("\033[33m");  
     printCentered("  #######  ########    #####   ######## ##        ##  ");
     printCentered(" ##        ##     ##  #     #       ##   ##      ##   ");
     printCentered(" ##        ##     ## ##     ##     ##     ##    ##    ");
@@ -180,10 +173,8 @@ void displayArt() {
     printCentered("      ##      ##     ##  ##   ##       ##     ");
     printCentered("      ##      ##     ## ##     ##   ########  ");
 
-    // Reset to default color and add a newline for spacing
     printf("\033[0m\n");
 
-    // Display a racing car under the title in yellow
     printf("\033[33m");
     printCentered("   ______");
     printCentered("  //  ||\\ \\ ");
@@ -215,46 +206,45 @@ void instructions() {
 
 void levels() {
     system("cls");
-    int choice = 0;  // Track the user's level choice
+    int choice = 0;  
     char input;
 
     while (1) {
-        // Clear screen and display level options
+
         system("cls");
         displayArt();
         printCentered("\033[32m\tChoose Your Level:\033[0m");
 
         if (choice == 0) {
-            printCentered("\033[31m  -> Impossible Level\033[0m");  // Dark red for impossible
+            printCentered("\033[31m  -> Impossible Level\033[0m");  
         } else {
             printCentered("   Impossible Level");
         }
 
         if (choice == 1) {
-            printCentered("\033[91m     -> Hard Level\033[0m");  // Light red for hard
+            printCentered("\033[91m     -> Hard Level\033[0m");  
         } else {
             printCentered("   Hard Level");
         }
 
         if (choice == 2) {
-            printCentered("\033[33m    -> Medium Level\033[0m");  // Orange for medium
+            printCentered("\033[33m    -> Medium Level\033[0m");  
         } else {
             printCentered("   Medium Level");
         }
 
         if (choice == 3) {
-            printCentered("\033[92m      -> Easy Level\033[0m");  // Light green for easy
+            printCentered("\033[92m      -> Easy Level\033[0m");  
         } else {
             printCentered("   Easy Level");
         }
 
         if (choice == 4) {
-            printCentered("\033[90m        -> Back\033[0m");  // Gray for back
+            printCentered("\033[90m        -> Back\033[0m");  
         } else {
             printCentered("\033[90m   Back\033[0m");
         }
 
-        // Wait for user input (w = up, s = down, enter to select)
         input = _getch();
 
         if (input == 'w') {
@@ -265,8 +255,8 @@ void levels() {
             if (choice < 4) {
                 choice++;
             }
-        } else if (input == '\r') {  // Enter key
-            // Update difficulty or go back
+        } else if (input == '\r') {  
+
             if (choice == 0) {
                 OFTEN = 2;
                 SPEED = 2;
@@ -280,18 +270,15 @@ void levels() {
                 OFTEN = 4;
                 SPEED = 10;
             } else if (choice == 4) {
-                return;  // Go back to the main menu
+                return;  
             }
 
-            // Confirm the choice and go back to the main menu
             system("cls");
             printCentered("\033[32mLevel Selected. Returning to Main Menu...\033[0m");
             return;
         }
     }
 }
-
-
 
 void credits() {
     system("cls");
@@ -300,77 +287,73 @@ void credits() {
     _getch();
 }
 
-
-
 int main() {
-    int choice = 0;  // 0: Start Game, 1: Quit
+    int choice = 0;  
     char input;
 
     while (1) {
-        // Clear the screen
-        system("cls");  // Use "clear" on Linux/Mac
 
-        // Display ASCII art
+        system("cls");  
+
         displayArt();
 
         if (choice == 0) {
-            printCentered("\033[36m  -> Start Game\033[0m");  // Cyan for selected option
+            printCentered("\033[36m  -> Start Game\033[0m");  
         } else {
             printCentered("   Start Game");
         }
 
         if (choice == 1) {
-            printCentered("\033[36m     -> Instructions\033[0m");  // Cyan for selected option
+            printCentered("\033[36m     -> Instructions\033[0m");  
         } else {
             printCentered("   Instructions");
         }
 
         if (choice == 2) {
-            printCentered("\033[36m    -> Choose Level\033[0m");  // Cyan for selected option
+            printCentered("\033[36m    -> Choose Level\033[0m");  
         } else {
             printCentered("   Choose Level");
         }
 
         if (choice == 3) {
-            printCentered("\033[36m      -> Credits\033[0m");  // Cyan for selected option
+            printCentered("\033[36m      -> Credits\033[0m");  
         } else {
             printCentered("   Credits");
         }
 
         if (choice == 4) {
-            printCentered("\033[36m     -> Quit\033[0m");  // Cyan for selected option
+            printCentered("\033[36m     -> Quit\033[0m");  
         } else {
             printCentered("   Quit");
         }
 
-        // Wait for user input (w = up, s = down, enter to select)
-        input = _getch();  // Get user input without Enter
+        input = _getch();  
 
         if (input == 'w') {
             if (choice > 0) {
-                choice--;  // Move cursor up
+                choice--;  
             }
         } else if (input == 's') {
             if (choice < 4) {
-                choice++;  // Move cursor down
+                choice++;  
             }
-        } else if (input == '\r') {  // '\r' is the Enter key
-            // Perform selected action
+        } else if (input == '\r') {  
+
             if (choice == 0) {
-                startGame();  // Start the game
+                startGame();  
             }
             if (choice == 1) {
-                instructions();  // Show instructions
+                instructions();  
             }
             if (choice == 2) {
-                levels();  // Show score
+                levels();  
             }
             if (choice == 3) {
-                credits();  // Show credits
+                credits();  
             }
             if (choice == 4) {
-                printf("\033[31mExiting the game. Goodbye!\033[0m\n");  // Red text
-                return 0;  // Exit menu loop
+                printf("\033[31mExiting the game. Goodbye!\033[0m\n");  
+                return 0;  
             }
         }
     }
