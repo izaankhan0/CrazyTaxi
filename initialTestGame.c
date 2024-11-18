@@ -4,125 +4,130 @@
 #include <conio.h>
 #include <windows.h>
 
-#define WIDTH 61  // Total width including lane separators
-#define HEIGHT 25
+int OFTEN = 7;
+int SPEED  = 10;
+#define WIDTH 80  
+#define HEIGHT 27
 #define CAR_POS_Y (HEIGHT - 2)
+#define CONSOLE_WIDTH 115  
 
-int lanes[13] = {0, 5,10,15,20,25,30,35,40,45,50,55,60};  // X positions of the 3 lanes
-int car_lane = 1;  // Player starts in the middle lane (index 1)
+int lanes[8] = {0, 10, 20, 30, 40, 50, 60, 70};  
+int car_lane = 1;  
 int score = 0;
-int traffic_x[HEIGHT];  // X positions of traffic cars
-int traffic_y[HEIGHT];  // Y positions of traffic cars
-int traffic_lane[HEIGHT]; // Traffic car lane
-int traffic_count = 0;  // Number of traffic cars on the road
+char *taxi_designs[5] = {"{<..>}", "{oOOo}", "{8<>8}", "{:TT:}", "{*oO*}"};
+
+typedef struct {
+    int x;
+    int y;
+    int lane;
+    int active;
+    char *design;  
+} TrafficCar;
+
+TrafficCar traffic[HEIGHT];  
 
 void setup() {
     system("cls");
     srand(time(NULL));
 
-    // Initialize traffic positions
     for (int i = 0; i < HEIGHT; i++) {
-        traffic_x[i] = -1;
-        traffic_y[i] = -1;
-        traffic_lane[i] = -1;
+        traffic[i].x = -1;
+        traffic[i].y = -1;
+        traffic[i].lane = -1;
+        traffic[i].active = 0;
+        traffic[i].design = NULL;
     }
+    car_lane = 1;  
+    score = 0;     
 }
 
 void draw() {
     system("cls");
 
-    // Draw road and traffic
     for (int y = 0; y < HEIGHT; y++) {
-//    	printf("\t\t\t\t");
-		for (int i = 0; i < 30; i++)	{
-			printf("\033[90m");
-			printf(".");
-			printf("\033[0m");
-		}
+
+        printf("\e[1;31m..................\033[0m");
+
         for (int x = 0; x < WIDTH; x++) {
-            if (y == CAR_POS_Y && x == lanes[car_lane]+2) {
-                printf("\033[0;32m");
-				printf("/-A-\\");  // Player's car;
-                printf("\033[0m");
-                while (x < lanes[car_lane]+6)	{
-                	x++;
-				}
-                
+            if (y == CAR_POS_Y && x == lanes[car_lane] + 1) {
+                printf("\e[0;33m[:TAXI:]\033[0m");
+                x += 7;  
             } else {
                 int is_traffic = 0;
-                for (int i = 0; i < traffic_count; i++) {
-                    if (traffic_x[i] == x-4 && traffic_y[i] == y) {
-                        
-						printf("V");  // Traffic vehicle
+                for (int i = 0; i < HEIGHT; i++) {
+                    if (traffic[i].y == y && traffic[i].active && x == traffic[i].x + 2) {
+                        printf("\e[0;32m%s\033[0m", traffic[i].design);
                         is_traffic = 1;
+                        x += 5;  
                         break;
                     }
                 }
-	                if (!is_traffic) {
-	                    if (x == lanes[0] || x == lanes[3] || x == lanes[6] || x == lanes[9] || x == lanes[12]) {
-	                        printf("|");  // Lane marker
-	                    } else {
-	                    	printf(" ");
-						
-	
-	                    }
-                    
-                
+                if (!is_traffic) {
+
+                    int is_lane_separator = 0;
+                    for (int j = 0; j < 7; j += 2) {
+                        if (j < 8 && x == lanes[j]) {
+                            printf("\e[1;31m|\033[0m");
+                            is_lane_separator = 1;
+                            break;
+                        }
+                    }
+                    if (!is_lane_separator) {
+                        printf(" ");
+                    }
                 }
             }
         }
-        for (int i = 0; i < 29; i++)	{
-			printf("\033[90m");
-			printf(".");
-			printf("\033[0m");
-		}
-        printf("\n");
+        printf("\e[1;31m|.....................\033[0m\n");
     }
 
-    // Display score
-    printf("Score: %d\n", score);
+    printf("\e[1;31mScore: %d\033[0m\n", score);
 }
 
 void update_traffic() {
-    // Move existing traffic downward
-    for (int i = 0; i < traffic_count; i++) {
-        if (traffic_y[i] < HEIGHT - 1) {
-            traffic_y[i]++;
-        } else {
-            // If traffic is out of the screen, reset it
-            traffic_x[i] = -1;
-            traffic_y[i] = -1;
-            traffic_lane[i] = -1;
+
+    for (int i = 0; i < HEIGHT; i++) {
+        if (traffic[i].active) {
+            traffic[i].y++;
+            if (traffic[i].y >= HEIGHT) {
+
+                traffic[i].active = 0;
+            }
         }
     }
 
-    // Add new traffic car in random lanes
-    if (rand() % 5 == 0 && traffic_count < HEIGHT) {  // Add traffic at random intervals
-        int lane = rand() % 13;  // Random lane 0, 1, or 2
-        traffic_x[traffic_count] = lanes[lane];  // Assign the X position based on lane center
-        traffic_y[traffic_count] = 0;  // Start at the top
-        traffic_lane[traffic_count] = lane;  // Store lane number for collision check
-        traffic_count++;
-    }
-
-    // Remove old traffic cars from the array
-    for (int i = 0; i < traffic_count; i++) {
-        if (traffic_y[i] == -1) {
-            for (int j = i; j < traffic_count - 1; j++) {
-                traffic_x[j] = traffic_x[j + 1];
-                traffic_y[j] = traffic_y[j + 1];
-                traffic_lane[j] = traffic_lane[j + 1];
+    if (rand() % OFTEN == 0) {  
+        for (int i = 0; i < HEIGHT; i++) {
+            if (!traffic[i].active) {  
+                int lane = rand() % 8;  
+                traffic[i].x = lanes[lane];
+                traffic[i].y = 0;  
+                traffic[i].lane = lane;
+                traffic[i].active = 1;
+                traffic[i].design = taxi_designs[rand() % 5];  
+                break;
             }
-            traffic_count--;
         }
     }
 }
 
 void check_collision() {
-    for (int i = 0; i < traffic_count; i++) {
-        if (traffic_y[i] == CAR_POS_Y && traffic_lane[i] == car_lane) {
-            printf("Game Over! Final score: %d\n", score);
-            exit(0);
+    for (int i = 0; i < HEIGHT; i++) {
+        if (traffic[i].active && traffic[i].y == CAR_POS_Y && traffic[i].lane == car_lane) {
+            system("cls");
+            printf("\033[31mGame Over!\033[0m Final score: %d\n", score);
+
+            printf("Press 'r' to retry or 'm' to return to the main menu.\n");
+
+            while (1) {
+                char choice = _getch();
+                if (choice == 'r') {
+                    setup();  
+                    return;
+                } else if (choice == 'm') {
+                    main();
+                }
+            }
         }
     }
 }
@@ -132,16 +137,54 @@ void input() {
         char key = _getch();
         switch (key) {
             case 'a':
-                if (car_lane > 0) car_lane--;  // Move left to previous lane
+                if (car_lane > 0) car_lane--;  
                 break;
             case 'd':
-                if (car_lane < 10) car_lane++;  // Move right to next lane
+                if (car_lane < 7) car_lane++;  
                 break;
         }
     }
 }
 
-int main() {
+void printCentered(char* text) {
+    int padding = (CONSOLE_WIDTH - strlen(text)) / 2;  
+    for (int i = 0; i < padding; i++) {
+        printf(" ");  
+    }
+    printf("%s\n", text);  
+}
+
+void displayArt() {
+
+    printf("\033[33m");  
+    printCentered("  #######  ########    #####   ######## ##        ##  ");
+    printCentered(" ##        ##     ##  #     #       ##   ##      ##   ");
+    printCentered(" ##        ##     ## ##     ##     ##     ##    ##    ");
+    printCentered(" ##        ########  #########    ##       ##  ##     ");
+    printCentered(" ##     ## ##     ## ##     ##   ##          ##       ");
+    printCentered(" ##     ## ##     ## ##     ##  ##           ##       ");
+    printCentered("  #######  ##     ## ##     ## ########      ##       ");
+    printCentered("\n");
+    printCentered(" ############   #####   ##     ##  ########## ");
+    printCentered("      ##       #     #   ##   ##       ##     ");
+    printCentered("      ##      ##     ##   ## ##        ##     ");
+    printCentered("      ##      #########    ###         ##     ");
+    printCentered("      ##      ##     ##   ## ##        ##     ");
+    printCentered("      ##      ##     ##  ##   ##       ##     ");
+    printCentered("      ##      ##     ## ##     ##   ########  ");
+
+    printf("\033[0m\n");
+
+    printf("\033[33m");
+    printCentered("   ______");
+    printCentered("  //  ||\\ \\ ");
+    printCentered(" ____||_ ||_\\___");
+    printCentered("'  _     _      O  _");
+    printCentered("'-(_)---(_)------(_)-'");
+    printf("\033[0m\n");
+}
+
+void startGame() {
     setup();
 
     while (1) {
@@ -151,187 +194,169 @@ int main() {
         check_collision();
 
         score++;
-        Sleep(40);  // Control game speed
+        Sleep(SPEED);
+    }
+}
+
+void instructions() {
+    system("cls");
+    printf("\033[32mJOOS PILADOOOOOOOOO\033[0m\n");
+    _getch();
+}
+
+void levels() {
+    system("cls");
+    int choice = 0;  
+    char input;
+
+    while (1) {
+
+        system("cls");
+        displayArt();
+        printCentered("\033[32m\tChoose Your Level:\033[0m");
+
+        if (choice == 0) {
+            printCentered("\033[31m  -> Impossible Level\033[0m");  
+        } else {
+            printCentered("   Impossible Level");
+        }
+
+        if (choice == 1) {
+            printCentered("\033[91m     -> Hard Level\033[0m");  
+        } else {
+            printCentered("   Hard Level");
+        }
+
+        if (choice == 2) {
+            printCentered("\033[33m    -> Medium Level\033[0m");  
+        } else {
+            printCentered("   Medium Level");
+        }
+
+        if (choice == 3) {
+            printCentered("\033[92m      -> Easy Level\033[0m");  
+        } else {
+            printCentered("   Easy Level");
+        }
+
+        if (choice == 4) {
+            printCentered("\033[90m        -> Back\033[0m");  
+        } else {
+            printCentered("\033[90m   Back\033[0m");
+        }
+
+        input = _getch();
+
+        if (input == 'w') {
+            if (choice > 0) {
+                choice--;
+            }
+        } else if (input == 's') {
+            if (choice < 4) {
+                choice++;
+            }
+        } else if (input == '\r') {  
+
+            if (choice == 0) {
+                OFTEN = 2;
+                SPEED = 2;
+            } else if (choice == 1) {
+                OFTEN = 3;
+                SPEED = 3;
+            } else if (choice == 2) {
+                OFTEN = 4;
+                SPEED = 5;
+            } else if (choice == 3) {
+                OFTEN = 4;
+                SPEED = 10;
+            } else if (choice == 4) {
+                return;  
+            }
+
+            system("cls");
+            printCentered("\033[32mLevel Selected. Returning to Main Menu...\033[0m");
+            return;
+        }
+    }
+}
+
+void credits() {
+    system("cls");
+    printf("\033[32mIzaan Khan\033[0m\n");
+    printf("\033[32mTalha Avasti\033[0m\n");
+    _getch();
+}
+
+int main() {
+    int choice = 0;  
+    char input;
+
+    while (1) {
+
+        system("cls");  
+
+        displayArt();
+
+        if (choice == 0) {
+            printCentered("\033[36m  -> Start Game\033[0m");  
+        } else {
+            printCentered("   Start Game");
+        }
+
+        if (choice == 1) {
+            printCentered("\033[36m     -> Instructions\033[0m");  
+        } else {
+            printCentered("   Instructions");
+        }
+
+        if (choice == 2) {
+            printCentered("\033[36m    -> Choose Level\033[0m");  
+        } else {
+            printCentered("   Choose Level");
+        }
+
+        if (choice == 3) {
+            printCentered("\033[36m      -> Credits\033[0m");  
+        } else {
+            printCentered("   Credits");
+        }
+
+        if (choice == 4) {
+            printCentered("\033[36m     -> Quit\033[0m");  
+        } else {
+            printCentered("   Quit");
+        }
+
+        input = _getch();  
+
+        if (input == 'w') {
+            if (choice > 0) {
+                choice--;  
+            }
+        } else if (input == 's') {
+            if (choice < 4) {
+                choice++;  
+            }
+        } else if (input == '\r') {  
+
+            if (choice == 0) {
+                startGame();  
+            }
+            if (choice == 1) {
+                instructions();  
+            }
+            if (choice == 2) {
+                levels();  
+            }
+            if (choice == 3) {
+                credits();  
+            }
+            if (choice == 4) {
+                printf("\033[31mExiting the game. Goodbye!\033[0m\n");  
+                return 0;  
+            }
+        }
     }
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <time.h>
-//#include <conio.h>
-//#include <windows.h>
-//
-//#define WIDTH 55  // Total width including lane separators
-//#define HEIGHT 20
-//#define CAR_POS_Y (HEIGHT - 2)
-//
-//int lanes[13] = {0, 5,10,15,20,25,30,35,40,45,50,55,60};  // X positions of the 3 lanes
-//int car_lane = 1;  // Player starts in the middle lane (index 1)
-//int score = 0;
-//int traffic_x[HEIGHT];  // X positions of traffic cars
-//int traffic_y[HEIGHT];  // Y positions of traffic cars
-//int traffic_lane[HEIGHT]; // Traffic car lane
-//int traffic_count = 0;  // Number of traffic cars on the road
-//
-//void setup() {
-//    system("cls");
-//    srand(time(NULL));
-//
-//    // Initialize traffic positions
-//    for (int i = 0; i < HEIGHT; i++) {
-//        traffic_x[i] = -1;
-//        traffic_y[i] = -1;
-//        traffic_lane[i] = -1;
-//    }
-//}
-//
-//void draw() {
-//    system("cls");
-//
-//    // Draw road and traffic
-//    for (int y = 0; y < HEIGHT; y++) {
-////    	printf("\t\t\t\t");
-//		for (int i = 0; i < 34; i++)	{
-//			printf(".");
-//		}
-//        for (int x = 0; x < WIDTH; x++) {
-//            if (y == CAR_POS_Y && x == lanes[car_lane]+4) {
-//                printf("A");  // Player's car
-//            } else {
-//                int is_traffic = 0;
-//                for (int i = 0; i < traffic_count; i++) {
-//                    if (traffic_x[i] == x-4 && traffic_y[i] == y) {
-//                        printf("V");  // Traffic vehicle
-//                        is_traffic = 1;
-//                        break;
-//                    }
-//                }
-//                if (!is_traffic) {
-//                    if (x == lanes[0] || x == lanes[3] || x == lanes[6] || x == lanes[9]) {
-//                        printf("|");  // Lane marker
-//                    } else {
-//                        printf(" ");
-//
-//                    }
-//                    
-//                
-//                }
-//            }
-//        }
-//        for (int i = 0; i < 30; i++)	{
-//			printf(".");
-//		}
-//        printf("\n");
-//    }
-//
-//    // Display score
-//    printf("Score: %d\n", score);
-//}
-//
-//void update_traffic() {
-//    // Move existing traffic downward
-//    for (int i = 0; i < traffic_count; i++) {
-//        if (traffic_y[i] < HEIGHT - 1) {
-//            traffic_y[i]++;
-//        } else {
-//            // If traffic is out of the screen, reset it
-//            traffic_x[i] = -1;
-//            traffic_y[i] = -1;
-//            traffic_lane[i] = -1;
-//        }
-//    }
-//
-//    // Add new traffic car in random lanes
-//    if (rand() % 5 == 0 && traffic_count < HEIGHT) {  // Add traffic at random intervals
-//        int lane = rand() % 3;  // Random lane 0, 1, or 2
-//        traffic_x[traffic_count] = lanes[lane];  // Assign the X position based on lane center
-//        traffic_y[traffic_count] = 0;  // Start at the top
-//        traffic_lane[traffic_count] = lane;  // Store lane number for collision check
-//        traffic_count++;
-//    }
-//
-//    // Remove old traffic cars from the array
-//    for (int i = 0; i < traffic_count; i++) {
-//        if (traffic_y[i] == -1) {
-//            for (int j = i; j < traffic_count - 1; j++) {
-//                traffic_x[j] = traffic_x[j + 1];
-//                traffic_y[j] = traffic_y[j + 1];
-//                traffic_lane[j] = traffic_lane[j + 1];
-//            }
-//            traffic_count--;
-//        }
-//    }
-//}
-//
-//void check_collision() {
-//    for (int i = 0; i < traffic_count; i++) {
-//        if (traffic_y[i] == CAR_POS_Y && traffic_lane[i] == car_lane) {
-//            printf("Game Over! Final score: %d\n", score);
-//            exit(0);
-//        }
-//    }
-//}
-//
-//void input() {
-//    if (_kbhit()) {
-//        char key = _getch();
-//        switch (key) {
-//            case 'a':
-//                if (car_lane > 0) car_lane--;  // Move left to previous lane
-//                break;
-//            case 'd':
-//                if (car_lane < 11) car_lane++;  // Move right to next lane
-//                break;
-//        }
-//    }
-//}
-//
-//int main() {
-//    setup();
-//
-//    while (1) {
-//        draw();
-//        input();
-//        update_traffic();
-//        check_collision();
-//
-//        score++;
-//        Sleep(40);  // Control game speed
-//    }
-//
-//    return 0;
-//}
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
