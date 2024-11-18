@@ -7,7 +7,7 @@
 int OFTEN = 7;
 int SPEED  = 10;
 #define WIDTH 80  
-#define HEIGHT 20
+#define HEIGHT 27
 #define CAR_POS_Y (HEIGHT - 2)
 #define CONSOLE_WIDTH 115  
 
@@ -46,7 +46,7 @@ void draw() {
 
     for (int y = 0; y < HEIGHT; y++) {
 
-        printf("\e[1;31m...\033[0m");
+        printf("\e[1;31m..................\033[0m");
 
         for (int x = 0; x < WIDTH; x++) {
             if (y == CAR_POS_Y && x == lanes[car_lane] + 1) {
@@ -78,7 +78,7 @@ void draw() {
                 }
             }
         }
-        printf("\e[1;31m|...\033[0m\n");
+        printf("\e[1;31m|.....................\033[0m\n");
     }
 
     printf("\e[1;31mScore: %d\033[0m\n", score);
