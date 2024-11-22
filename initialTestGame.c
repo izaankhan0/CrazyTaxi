@@ -200,7 +200,14 @@ void startGame() {
 
 void instructions() {
     system("cls");
-    printf("\033[32mJOOS PILADOOOOOOOOO\033[0m\n");
+    printf("\033[32mUse A and D to maneuver your taxi\033[0m\n");
+    printf("\n");
+    printf("\033[32mThe score adds up every meter you go!\033[0m\n");
+    printf("\n");
+    printf("\033[32mYou die if you collide with upcoming traffic\033[0m\n");
+    printf("\n");
+    printf("\n");
+    printf("\033[32mPsst... Just don't choose level impossible, and you're all set :D\033[0m\n");
     _getch();
 }
 
