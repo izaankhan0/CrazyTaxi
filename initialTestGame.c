@@ -46,7 +46,7 @@ void draw() {
 
     for (int y = 0; y < HEIGHT; y++) {
 
-        printf("\e[1;31m..................\033[0m");
+        printf("\033[30;1m..................\033[0m");
 
         for (int x = 0; x < WIDTH; x++) {
             if (y == CAR_POS_Y && x == lanes[car_lane] + 1) {
@@ -78,7 +78,7 @@ void draw() {
                 }
             }
         }
-        printf("\e[1;31m|.....................\033[0m\n");
+        printf("\033[30;1m......................\033[0m\n");
     }
 
     printf("\e[1;31mScore: %d\033[0m\n", score);
@@ -283,7 +283,8 @@ void levels() {
 void credits() {
     system("cls");
     printf("\033[32mIzaan Khan\033[0m\n");
-    printf("\033[32mTalha Avasti\033[0m\n");
+    printf("\033[32mTalha Mirza\033[0m\n");
+    printf("\033[32mTushal Chhabbria\033[0m\n");
     _getch();
 }
 
